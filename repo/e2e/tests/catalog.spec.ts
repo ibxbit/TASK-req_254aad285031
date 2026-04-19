@@ -45,9 +45,9 @@ test.describe('Catalog page', () => {
     await expect(select).toBeVisible();
     const options = select.locator('option');
     await expect(options).toHaveCount(3);
-    await expect(options.nth(0)).toHaveValue('best_rated');
-    await expect(options.nth(1)).toHaveValue('lowest_price');
-    await expect(options.nth(2)).toHaveValue('soonest_available');
+    await expect(options.nth(0)).toHaveAttribute('value', 'best_rated');
+    await expect(options.nth(1)).toHaveAttribute('value', 'lowest_price');
+    await expect(options.nth(2)).toHaveAttribute('value', 'soonest_available');
   });
 
   test('has two datetime-local inputs for availability window', async ({ page }) => {
