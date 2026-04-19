@@ -1,9 +1,10 @@
-/target
 **/target
-Cargo.lock
 
-# Frontend build output
-/frontend/dist
+# Frontend — only generated WASM artifacts, not the source HTML/JS files
+/frontend/dist/assets/dioxus/frontend.js
+/frontend/dist/assets/dioxus/frontend_bg.wasm
+/frontend/dist/assets/dioxus/frontend_bg.wasm.d.ts
+/frontend/dist/assets/dioxus/snippets/
 
 # Local config + secrets
 /config/config.toml
@@ -19,21 +20,10 @@ Cargo.lock
 
 # Node/Playwright/E2E
 e2e/node_modules/
-e2e/package-lock.json
 e2e/playwright-report/
 e2e/.env
 e2e/.env.*
 e2e/npm-debug.log*
-e2e/yarn.lock
-e2e/pnpm-lock.yaml
-e2e/.pnp.*
-
-# General Node
-node_modules/
-npm-debug.log*
-yarn.lock
-pnpm-lock.yaml
-.pnp.*
 
 # System/OS
 *.DS_Store
