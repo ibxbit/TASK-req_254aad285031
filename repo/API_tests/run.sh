@@ -12,14 +12,22 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
-if ! command -v cargo >/dev/null 2>&1; then
-    echo "ERROR: cargo not found in PATH. Install Rust: https://rustup.rs/"
-    exit 1
-fi
-
 : "${API_BASE:=http://127.0.0.1:8000}"
 export API_BASE
 
-echo "API_BASE=$API_BASE"
-echo "cargo test -p api_tests --tests"
-cargo test -p api_tests --tests -- --nocapture
+CMD="cargo test -p api_tests --tests -- --nocapture"
+
+if command -v cargo >/dev/null 2>&1; then
+    echo "API_BASE=$API_BASE"
+    echo "$CMD"
+    exec $CMD
+else
+    echo "cargo not in PATH — running inside rust:1.88-bookworm container (--network host)"
+    exec docker run --rm \
+        -v "$(pwd):/workspace" \
+        -w /workspace \
+        --network host \
+        -e API_BASE="$API_BASE" \
+        rust:1.88-bookworm \
+        bash -c "$CMD"
+fi

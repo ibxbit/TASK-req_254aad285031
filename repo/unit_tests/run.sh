@@ -11,10 +11,16 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
-if ! command -v cargo >/dev/null 2>&1; then
-    echo "ERROR: cargo not found in PATH. Install Rust: https://rustup.rs/"
-    exit 1
-fi
+CMD="cargo test -p unit_tests -p shared -p backend -p frontend_core -p frontend_tests --lib --tests"
 
-echo "cargo test -p unit_tests -p shared -p backend -p frontend_core -p frontend_tests --lib --tests"
-cargo test -p unit_tests -p shared -p backend -p frontend_core -p frontend_tests --lib --tests
+if command -v cargo >/dev/null 2>&1; then
+    echo "$CMD"
+    exec $CMD
+else
+    echo "cargo not in PATH — running inside rust:1.88-bookworm container"
+    exec docker run --rm \
+        -v "$(pwd):/workspace" \
+        -w /workspace \
+        rust:1.88-bookworm \
+        bash -c "$CMD"
+fi
