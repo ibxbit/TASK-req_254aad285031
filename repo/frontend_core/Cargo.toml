@@ -1,0 +1,20 @@
+[package]
+name = "frontend_core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+# frontend_core is the non-wasm slice of the frontend: pure Rust logic with
+# no dependency on web-sys / wasm-bindgen / Dioxus. This lets us run
+# unit tests against real code on the native target (`cargo test -p
+# frontend_core`) without a browser, while the `frontend` binary pulls
+# these modules in verbatim.
+
+[dependencies]
+shared = { path = "../shared" }
+serde = { workspace = true }
+serde_json = { workspace = true }

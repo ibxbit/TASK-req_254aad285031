@@ -1,0 +1,24 @@
+[application]
+name = "field-service-hub"
+default_platform = "web"
+out_dir = "dist"
+asset_dir = "assets"
+
+[web.app]
+title = "Field Service Operations Hub"
+
+[web.watcher]
+reload_html = true
+watch_path = ["src"]
+
+[web.resource]
+style = []
+# sw-register.js boots the service worker from /sw.js on page load.
+script = ["sw-register.js"]
+
+[web.resource.dev]
+style = []
+script = []
+
+[[web.proxy]]
+backend = "http://127.0.0.1:8000/"

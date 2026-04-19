@@ -1,0 +1,21 @@
+# Exclude compiled artifacts from Docker build context
+target/
+/tmp/backend_build/
+*.exe
+
+# Exclude test data and local dev files
+.env
+.env.*
+*.local
+
+# Git and editor files
+.git/
+.gitignore
+*.swp
+*.swo
+.DS_Store
+
+# Node modules (e2e tests, not needed in Docker)
+e2e/node_modules/
+e2e/playwright-report/
+e2e/test-results/

@@ -1,0 +1,74 @@
+# One-click startup for the Field Service Operations Hub.
+# Usage:
+#   docker compose up
+#
+# Brings up:
+#   * mysql      — persistent DB, schema auto-loaded on first start
+#   * backend    — Rocket API on :8000 (also proxied via frontend at /api)
+#   * frontend   — nginx serving the Dioxus web bundle on :3000
+
+name: fsh
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: fsh-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: field_service_hub
+      MYSQL_USER: hub_user
+      MYSQL_PASSWORD: hub_pass
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - -h
+        - localhost
+        - -uhub_user
+        - -phub_pass
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    ports:
+      - "3306:3306"
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: fsh-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      # Config + master.key persist on the host so encrypted data survives
+      # restarts. Entrypoint fills in defaults on first run — no manual edits.
+      - ./config:/app/config
+      - backend_data:/app/data
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: fsh-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  mysql_data:
+  backend_data:

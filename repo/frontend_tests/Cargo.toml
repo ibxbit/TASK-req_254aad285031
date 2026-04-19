@@ -1,0 +1,25 @@
+[package]
+name = "frontend_tests"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+# This crate exists solely for native-target tests of the frontend rendered
+# layer. It uses dioxus-ssr to render Dioxus components to HTML strings and
+# asserts on structure, without needing a browser or the wasm32 target.
+#
+# Run with:   cargo test -p frontend_tests
+#
+# The crate intentionally does NOT depend on `frontend` (the wasm-only binary)
+# so it compiles on the native host target. Components are defined inline here
+# and mirror the key structural elements of the real frontend pages.
+
+[lib]
+path = "src/lib.rs"
+
+[dev-dependencies]
+dioxus = "0.5"
+dioxus-ssr = "0.5"
+frontend_core = { path = "../frontend_core" }
+shared = { path = "../shared" }

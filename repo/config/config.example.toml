@@ -1,0 +1,32 @@
+# Copy to config.toml and adjust for your environment.
+# All values are local/on-premise only.
+
+[server]
+bind_address = "0.0.0.0"
+port = 8000
+
+[database]
+# Local MySQL instance on LAN or single machine.
+url = "mysql://hub_user:hub_pass@127.0.0.1:3306/field_service_hub"
+
+[encryption]
+# Path to a local file containing a 32-byte key for AES-GCM at-rest encryption.
+# Generate with: head -c 32 /dev/urandom > ./config/master.key
+key_file = "./config/master.key"
+
+[storage]
+# Local on-disk paths (created automatically on first upload).
+review_images_dir      = "./data/review_images"
+report_attachments_dir = "./data/report_attachments"
+face_images_dir        = "./data/face_images"
+
+[policy]
+# Local timezone for internship deadline computation.
+# Offset in minutes from UTC (e.g., -300 = US/Eastern, 330 = Asia/Kolkata,
+# 0 = UTC, -480 = US/Pacific). Deadlines are computed in this local time:
+#   * weekly:  Monday 12:00 local
+#   * monthly: 5th   17:00 local
+# Late grace window (hours): submissions past deadline still accepted and
+# flagged; beyond grace are rejected.
+local_timezone_offset_minutes = 0
+late_grace_hours              = 72

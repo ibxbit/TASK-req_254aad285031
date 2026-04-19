@@ -1,0 +1,21 @@
+# Lightweight Dockerfile that uses the already-compiled host binary.
+# Build the binary first with: cargo build --release --package backend
+# Then run: docker compose -f docker-compose.prebuilt.yml up -d
+
+FROM debian:bookworm-slim
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates libssl3 curl \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY target/release/backend /app/backend
+COPY config /app/config
+COPY db /app/db
+COPY backend/docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh \
+    && mkdir -p /app/data/review_images /app/data/report_attachments /app/data/face_images
+
+EXPOSE 8000
+HEALTHCHECK --interval=10s --timeout=3s --start-period=15s --retries=5 \
+    CMD curl -fsS http://localhost:8000/api/health || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]

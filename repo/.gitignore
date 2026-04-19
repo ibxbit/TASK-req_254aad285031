@@ -1,0 +1,44 @@
+/target
+**/target
+Cargo.lock
+
+# Frontend build output
+/frontend/dist
+
+# Local config + secrets
+/config/config.toml
+/config/master.key
+
+# Local runtime data (uploaded images, etc.)
+/data
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Node/Playwright/E2E
+e2e/node_modules/
+e2e/package-lock.json
+e2e/playwright-report/
+e2e/.env
+e2e/.env.*
+e2e/npm-debug.log*
+e2e/yarn.lock
+e2e/pnpm-lock.yaml
+e2e/.pnp.*
+
+# General Node
+node_modules/
+npm-debug.log*
+yarn.lock
+pnpm-lock.yaml
+.pnp.*
+
+# System/OS
+*.DS_Store
+Thumbs.db
+
+# Miscellaneous
+*.log
+.tmp/

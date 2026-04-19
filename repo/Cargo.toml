@@ -1,0 +1,24 @@
+[workspace]
+resolver = "2"
+members = [
+    "backend",
+    "frontend",
+    "frontend_core",
+    "frontend_tests",
+    "shared",
+    "unit_tests",
+    "API_tests",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Field Service Ops Hub"]
+license = "Proprietary"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+thiserror = "1"
