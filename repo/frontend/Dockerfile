@@ -2,8 +2,7 @@
 # to the backend service.
 
 FROM rust:1.88-bookworm AS builder
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    rustup target add wasm32-unknown-unknown \
+RUN rustup target add wasm32-unknown-unknown \
     && cargo install wasm-bindgen-cli --version 0.2.118 --locked
 WORKDIR /build
 COPY . .
