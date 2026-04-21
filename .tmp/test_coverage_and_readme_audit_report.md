@@ -5,11 +5,11 @@
 - Inspection mode: **static only** (no execution performed).
 - Project type declaration found: `fullstack web application` (`repo/README.md:3`).
 - API mount prefix resolved: `/api` (`repo/backend/src/main.rs:52`).
-- Endpoint source used: Rocket route attributes under `repo/backend/src/routes/**/*.rs` (91 route attributes found) + mounted route list (`repo/backend/src/main.rs:53-161`).
+- Endpoint source used: Rocket route attributes under `repo/backend/src/routes/**/*.rs` (92 route attributes found) + mounted route list (`repo/backend/src/main.rs:53-161`).
 
 ## Backend Endpoint Inventory
 
-Total resolved endpoints: **91** (normalized `:param` style).
+Total resolved endpoints: **92** (normalized `:param` style).
 
 1. `GET /api/health`
 2. `POST /api/auth/register`
@@ -37,71 +37,72 @@ Total resolved endpoints: **91** (normalized `:param` style).
 24. `POST /api/boards`
 25. `PATCH /api/boards/:id`
 26. `DELETE /api/boards/:id`
-27. `POST /api/boards/:id/moderators`
-28. `DELETE /api/boards/:id/moderators/:user_id`
-29. `GET /api/boards/:id/rules`
-30. `POST /api/boards/:id/rules`
-31. `DELETE /api/rules/:id`
-32. `POST /api/boards/:id/teams`
-33. `DELETE /api/boards/:id/teams/:team_id`
-34. `GET /api/boards/:id/posts`
-35. `GET /api/posts/:id`
-36. `POST /api/posts`
-37. `PATCH /api/posts/:id/pin`
-38. `GET /api/posts/:id/comments`
-39. `POST /api/comments`
-40. `DELETE /api/comments/:id`
-41. `POST /api/services`
-42. `PATCH /api/services/:id`
-43. `GET /api/services/:id`
-44. `GET /api/services/search`
-45. `GET /api/services/compare`
-46. `POST /api/services/:id/favorite`
-47. `GET /api/categories`
-48. `POST /api/categories`
-49. `POST /api/services/:id/categories`
-50. `GET /api/tags`
-51. `POST /api/tags`
-52. `POST /api/services/:id/tags`
-53. `POST /api/services/:id/availability`
-54. `POST /api/work-orders`
-55. `GET /api/work-orders/:id`
-56. `POST /api/work-orders/:id/complete`
-57. `POST /api/reviews`
-58. `POST /api/work-orders/:id/follow-up-review`
-59. `GET /api/services/:id/reviews`
-60. `PATCH /api/reviews/:id/pin`
-61. `PATCH /api/reviews/:id/collapse`
-62. `POST /api/review-tags`
-63. `GET /api/review-tags`
-64. `POST /api/reviews/:id/tags`
-65. `POST /api/reviews/:id/images`
-66. `GET /api/services/:id/reputation`
-67. `POST /api/internships/plans`
-68. `POST /api/reports`
-69. `POST /api/reports/:id/comments`
-70. `POST /api/reports/:id/approve`
-71. `POST /api/reports/:id/attachments`
-72. `GET /api/interns/:id/dashboard`
-73. `POST /api/warehouses`
-74. `PATCH /api/warehouses/:id`
-75. `DELETE /api/warehouses/:id`
-76. `GET /api/warehouses/:id/history`
-77. `GET /api/warehouses/tree`
-78. `POST /api/warehouse-zones`
-79. `PATCH /api/warehouse-zones/:id`
-80. `DELETE /api/warehouse-zones/:id`
-81. `GET /api/warehouse-zones/:id/history`
-82. `POST /api/bins`
-83. `PATCH /api/bins/:id`
-84. `GET /api/bins/:id/history`
-85. `POST /api/faces`
-86. `POST /api/faces/:id/validate`
-87. `POST /api/faces/:id/liveness`
-88. `POST /api/faces/:id/deactivate`
-89. `GET /api/faces/:user_id`
-90. `GET /api/audit/verify`
-91. `GET /api/audit/:entity_type/:entity_id`
+27. `GET /api/boards/:id/moderators`
+28. `POST /api/boards/:id/moderators`
+29. `DELETE /api/boards/:id/moderators/:user_id`
+30. `GET /api/boards/:id/rules`
+31. `POST /api/boards/:id/rules`
+32. `DELETE /api/rules/:id`
+33. `POST /api/boards/:id/teams`
+34. `DELETE /api/boards/:id/teams/:team_id`
+35. `GET /api/boards/:id/posts`
+36. `GET /api/posts/:id`
+37. `POST /api/posts`
+38. `PATCH /api/posts/:id/pin`
+39. `GET /api/posts/:id/comments`
+40. `POST /api/comments`
+41. `DELETE /api/comments/:id`
+42. `POST /api/services`
+43. `PATCH /api/services/:id`
+44. `GET /api/services/:id`
+45. `GET /api/services/search`
+46. `GET /api/services/compare`
+47. `POST /api/services/:id/favorite`
+48. `GET /api/categories`
+49. `POST /api/categories`
+50. `POST /api/services/:id/categories`
+51. `GET /api/tags`
+52. `POST /api/tags`
+53. `POST /api/services/:id/tags`
+54. `POST /api/services/:id/availability`
+55. `POST /api/work-orders`
+56. `GET /api/work-orders/:id`
+57. `POST /api/work-orders/:id/complete`
+58. `POST /api/reviews`
+59. `POST /api/work-orders/:id/follow-up-review`
+60. `GET /api/services/:id/reviews`
+61. `PATCH /api/reviews/:id/pin`
+62. `PATCH /api/reviews/:id/collapse`
+63. `POST /api/review-tags`
+64. `GET /api/review-tags`
+65. `POST /api/reviews/:id/tags`
+66. `POST /api/reviews/:id/images`
+67. `GET /api/services/:id/reputation`
+68. `POST /api/internships/plans`
+69. `POST /api/reports`
+70. `POST /api/reports/:id/comments`
+71. `POST /api/reports/:id/approve`
+72. `POST /api/reports/:id/attachments`
+73. `GET /api/interns/:id/dashboard`
+74. `POST /api/warehouses`
+75. `PATCH /api/warehouses/:id`
+76. `DELETE /api/warehouses/:id`
+77. `GET /api/warehouses/:id/history`
+78. `GET /api/warehouses/tree`
+79. `POST /api/warehouse-zones`
+80. `PATCH /api/warehouse-zones/:id`
+81. `DELETE /api/warehouse-zones/:id`
+82. `GET /api/warehouse-zones/:id/history`
+83. `POST /api/bins`
+84. `PATCH /api/bins/:id`
+85. `GET /api/bins/:id/history`
+86. `POST /api/faces`
+87. `POST /api/faces/:id/validate`
+88. `POST /api/faces/:id/liveness`
+89. `POST /api/faces/:id/deactivate`
+90. `GET /api/faces/:user_id`
+91. `GET /api/audit/verify`
+92. `GET /api/audit/:entity_type/:entity_id`
 
 Endpoint evidence source examples:
 
@@ -152,6 +153,7 @@ All endpoints map to HTTP tests as follows.
 | `POST /api/boards`                             | yes     | true no-mock HTTP | `API_tests/tests/endpoint_smoke.rs`, `API_tests/tests/contract_forum.rs`             | `catalog` entry (`endpoint_smoke.rs:115`)                                   |
 | `PATCH /api/boards/:id`                        | yes     | true no-mock HTTP | `API_tests/tests/endpoint_smoke.rs`, `API_tests/tests/contract_forum.rs`             | `catalog` entry (`endpoint_smoke.rs:120`)                                   |
 | `DELETE /api/boards/:id`                       | yes     | true no-mock HTTP | `API_tests/tests/endpoint_smoke.rs`, `API_tests/tests/contract_forum.rs`             | `catalog` entry (`endpoint_smoke.rs:125`)                                   |
+| `GET /api/boards/:id/moderators`               | yes     | true no-mock HTTP | `API_tests/tests/fe_be_paths.rs`                                                     | board subresource GET (`fe_be_paths.rs:210`)                                |
 | `POST /api/boards/:id/moderators`              | yes     | true no-mock HTTP | `API_tests/tests/endpoint_smoke.rs`, `API_tests/tests/contract_forum.rs`             | `catalog` entry (`endpoint_smoke.rs:130`)                                   |
 | `DELETE /api/boards/:id/moderators/:user_id`   | yes     | true no-mock HTTP | `API_tests/tests/endpoint_smoke.rs`, `API_tests/tests/contract_forum.rs`             | `catalog` entry (`endpoint_smoke.rs:135`)                                   |
 | `GET /api/boards/:id/rules`                    | yes     | true no-mock HTTP | `API_tests/tests/endpoint_smoke.rs`, `API_tests/tests/contract_forum.rs`             | `catalog` entry (`endpoint_smoke.rs:140`)                                   |
@@ -235,9 +237,9 @@ All endpoints map to HTTP tests as follows.
 
 ## Coverage Summary
 
-- Total endpoints: **91**
-- Endpoints with HTTP tests: **91**
-- Endpoints with true no-mock HTTP tests: **91**
+- Total endpoints: **92**
+- Endpoints with HTTP tests: **92**
+- Endpoints with true no-mock HTTP tests: **92**
 - HTTP coverage: **100%**
 - True API coverage: **100%**
 
@@ -340,8 +342,8 @@ Required output:
 
 ## Tests Check
 
-- API endpoint coverage: complete (91/91)
-- True no-mock API coverage: complete (91/91)
+- API endpoint coverage: complete (92/92)
+- True no-mock API coverage: complete (92/92)
 - Frontend strict unit criterion: failed
 - E2E layer: present
 - Runner portability: local-toolchain dependent

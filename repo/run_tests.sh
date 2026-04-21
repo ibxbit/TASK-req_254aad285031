@@ -20,6 +20,10 @@ set -eu
 
 cd "$(dirname "$0")"
 
+# On Windows/Git-Bash pwd returns /c/... which Docker can't resolve as a host
+# path; pwd -W gives the native C:/... form that Docker Desktop understands.
+REPO="$(pwd -W 2>/dev/null || pwd)"
+
 WHICH="${1:-default}"
 RC=0
 
@@ -28,7 +32,11 @@ run_unit() {
     echo "============================================================"
     echo " Unit tests — cargo test (unit_tests crate + in-tree tests)"
     echo "============================================================"
-    if ! ./unit_tests/run.sh; then
+    if ! docker run --rm \
+        -v "$REPO:/workspace" \
+        -w //workspace \
+        rust:1.88-bookworm \
+        bash -c "cargo test -p unit_tests -p shared -p backend -p frontend_core -p frontend_tests --lib --tests"; then
         RC=1
     fi
 }
@@ -38,7 +46,13 @@ run_api() {
     echo "============================================================"
     echo " API tests  — cargo test -p api_tests"
     echo "============================================================"
-    if ! ./API_tests/run.sh; then
+    if ! docker run --rm \
+        -v "$REPO:/workspace" \
+        -w //workspace \
+        --network host \
+        -e API_BASE="${API_BASE:-http://127.0.0.1:8000}" \
+        rust:1.88-bookworm \
+        bash -c "cargo test -p api_tests --tests -- --nocapture"; then
         RC=1
     fi
 }
@@ -48,7 +62,14 @@ run_e2e() {
     echo "============================================================"
     echo " E2E tests  — Playwright (requires docker compose up)"
     echo "============================================================"
-    if ! ./e2e/run.sh; then
+    if ! docker run --rm \
+        -v "$REPO/e2e:/e2e" \
+        -w //e2e \
+        --network host \
+        -e FRONTEND_URL="${FRONTEND_URL:-http://127.0.0.1:3000}" \
+        -e API_BASE="${API_BASE:-http://127.0.0.1:8000}" \
+        mcr.microsoft.com/playwright:v1.44.0-jammy \
+        bash -c "npm install && npx playwright test"; then
         RC=1
     fi
 }
