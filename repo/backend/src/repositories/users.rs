@@ -20,6 +20,43 @@ pub struct UserProfileRow {
     pub sensitive_id_mask: Option<String>,
 }
 
+fn map_auth_row(row: (Vec<u8>, String, String, i8)) -> Option<UserAuthRow> {
+    let (id_b, hash, role, is_active) = row;
+    let id = Uuid::from_slice(&id_b).ok()?;
+    Some(UserAuthRow {
+        id,
+        password_hash: hash,
+        role,
+        is_active: is_active != 0,
+    })
+}
+
+fn map_profile_row(row: (Vec<u8>, String, String, i8, Option<String>)) -> Option<UserProfileRow> {
+    let (id_b, username, role, is_active, mask) = row;
+    let id = Uuid::from_slice(&id_b).ok()?;
+    Some(UserProfileRow {
+        id,
+        username,
+        role,
+        is_active: is_active != 0,
+        sensitive_id_mask: mask,
+    })
+}
+
+fn map_profile_row_with_known_id(
+    id: Uuid,
+    row: (String, String, i8, Option<String>),
+) -> UserProfileRow {
+    let (username, role, is_active, mask) = row;
+    UserProfileRow {
+        id,
+        username,
+        role,
+        is_active: is_active != 0,
+        sensitive_id_mask: mask,
+    }
+}
+
 pub async fn count(pool: &MySqlPool) -> sqlx::Result<i64> {
     let row: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM users")
         .fetch_one(pool)
@@ -53,15 +90,7 @@ pub async fn find_auth_by_username(
             .bind(username)
             .fetch_optional(pool)
             .await?;
-    Ok(row.and_then(|(id_b, hash, role, is_active)| {
-        let id = Uuid::from_slice(&id_b).ok()?;
-        Some(UserAuthRow {
-            id,
-            password_hash: hash,
-            role,
-            is_active: is_active != 0,
-        })
-    }))
+    Ok(row.and_then(map_auth_row))
 }
 
 pub async fn find_profile_by_id(
@@ -74,13 +103,7 @@ pub async fn find_profile_by_id(
     .bind(&id.as_bytes()[..])
     .fetch_optional(pool)
     .await?;
-    Ok(row.map(|(username, role, is_active, mask)| UserProfileRow {
-        id,
-        username,
-        role,
-        is_active: is_active != 0,
-        sensitive_id_mask: mask,
-    }))
+    Ok(row.map(|r| map_profile_row_with_known_id(id, r)))
 }
 
 pub async fn list_all(pool: &MySqlPool) -> sqlx::Result<Vec<UserProfileRow>> {
@@ -89,19 +112,7 @@ pub async fn list_all(pool: &MySqlPool) -> sqlx::Result<Vec<UserProfileRow>> {
     )
     .fetch_all(pool)
     .await?;
-    Ok(rows
-        .into_iter()
-        .filter_map(|(id_b, username, role, is_active, mask)| {
-            let id = Uuid::from_slice(&id_b).ok()?;
-            Some(UserProfileRow {
-                id,
-                username,
-                role,
-                is_active: is_active != 0,
-                sensitive_id_mask: mask,
-            })
-        })
-        .collect())
+    Ok(rows.into_iter().filter_map(map_profile_row).collect())
 }
 
 pub async fn update_role(pool: &MySqlPool, id: Uuid, role: &str) -> sqlx::Result<u64> {
@@ -157,4 +168,74 @@ pub async fn get_sensitive_id_enc(pool: &MySqlPool, id: Uuid) -> sqlx::Result<Op
             .fetch_optional(pool)
             .await?;
     Ok(row.and_then(|(v,)| v))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn map_auth_row_returns_none_for_invalid_uuid_bytes() {
+        let row = (vec![1, 2, 3], "hash".to_string(), "requester".to_string(), 1);
+        assert!(map_auth_row(row).is_none());
+    }
+
+    #[test]
+    fn map_auth_row_sets_active_flag_from_nonzero() {
+        let id = Uuid::new_v4();
+        let row = (
+            id.as_bytes().to_vec(),
+            "hash".to_string(),
+            "requester".to_string(),
+            1,
+        );
+        let mapped = map_auth_row(row).expect("row should map");
+        assert_eq!(mapped.id, id);
+        assert!(mapped.is_active);
+    }
+
+    #[test]
+    fn map_profile_row_returns_none_for_invalid_uuid_bytes() {
+        let row = (
+            vec![9, 9],
+            "u".to_string(),
+            "administrator".to_string(),
+            0,
+            Some("***1234".to_string()),
+        );
+        assert!(map_profile_row(row).is_none());
+    }
+
+    #[test]
+    fn map_profile_row_preserves_mask_and_inactive_state() {
+        let id = Uuid::new_v4();
+        let row = (
+            id.as_bytes().to_vec(),
+            "user-a".to_string(),
+            "administrator".to_string(),
+            0,
+            Some("***1234".to_string()),
+        );
+        let mapped = map_profile_row(row).expect("row should map");
+        assert_eq!(mapped.id, id);
+        assert_eq!(mapped.sensitive_id_mask.as_deref(), Some("***1234"));
+        assert!(!mapped.is_active);
+    }
+
+    #[test]
+    fn map_profile_row_with_known_id_reuses_given_id() {
+        let id = Uuid::new_v4();
+        let mapped = map_profile_row_with_known_id(
+            id,
+            (
+                "known".to_string(),
+                "moderator".to_string(),
+                1,
+                None,
+            ),
+        );
+        assert_eq!(mapped.id, id);
+        assert_eq!(mapped.username, "known");
+        assert!(mapped.is_active);
+    }
 }

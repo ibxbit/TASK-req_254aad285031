@@ -181,7 +181,7 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:8000/api/audit/verify
 
 ## Testing
 
-All test suites are Rust-native. Run everything in one command:
+The test stack uses Rust for unit/API suites plus Playwright (TypeScript) for browser E2E. Run everything in one command:
 
 ```bash
 ./run_tests.sh           # unit + API, in that order
@@ -195,8 +195,8 @@ All test suites are Rust-native. Run everything in one command:
 |---|---|---|
 | Backend + shared unit | `cargo test -p backend -p shared -p unit_tests` | Crypto round-trips, Argon2 hashing, audit hash chain, face image checks, deadline math, logging redaction, DTO serde round-trips. |
 | Frontend unit | `cargo test -p frontend_core` | 45 unit + 6 workflow tests: AuthState, URL builder, route guards, nav visibility per role, tag toggle, rating clamp, API path builders — runs on the native target, no browser. |
-| Frontend rendered-layer | `cargo test -p frontend_tests` | 50+ dioxus-ssr tests: renders Dioxus components to HTML for all pages (login, home per role, work orders, forum, admin, warehouse) and asserts catalog filter controls, sort options, datetime-local inputs, compare bar states, error state CSS, nav visibility per role, route path constants — no browser or wasm toolchain required. |
-| API integration | `cargo test -p api_tests` (also via `./run_tests.sh api`) | 110+ reqwest tests: per-endpoint body-contract assertions for auth/session (login shape, /me shape, inactive→403, wrong-password→401, token usability), full RBAC matrix per role, ownership, review lifecycle, image upload limits, history authorization, forum visibility by team, lockout policy (5 failures→423, admin reset→200), catalog filter edges (single-sided availability, AND/OR semantics, pagination), frontend↔backend path confidence layer (validates frontend_core URL builders against live routes), cross-domain authorized response structure assertions, endpoint-smoke guardrail covering all 88 protected routes (91 total endpoints). |
+| Frontend rendered-layer | `cargo test -p frontend_tests` | dioxus-ssr tests render frontend structures to HTML (login, home per role, work orders, forum, admin, warehouse) and assert catalog filter controls, sort options, datetime-local inputs, compare bar states, error CSS, nav visibility per role, and route path constants — no browser or wasm toolchain required. |
+| API integration | `cargo test -p api_tests` (also via `./run_tests.sh api`) | reqwest integration tests cover per-endpoint contracts for auth/session, RBAC matrix checks, ownership and lifecycle flows, upload limits, history authorization, forum visibility by team, lockout policy, catalog filter edges (single-sided availability, AND/OR semantics, pagination), frontend↔backend path alignment checks, response-structure assertions, and full protected-route smoke guardrails. |
 
 ### API test admin credentials
 

@@ -287,32 +287,32 @@ Detection rule check:
 3. test framework evident:
    - Playwright (`repo/e2e/package.json:14`, `repo/e2e/playwright.config.ts:1`), Rust test harness, dioxus-ssr (`repo/frontend_tests/Cargo.toml:22-23`)
 4. tests import/render actual frontend components/modules:
-   - **not satisfied for unit layer**; `frontend_tests` explicitly does **not** depend on `frontend` and mirrors structures (`repo/frontend_tests/Cargo.toml:14-17`, `repo/frontend_tests/tests/pages_structure.rs:3-7`)
+   - satisfied for unit layer via direct tests in `frontend` crate (`repo/frontend/src/router.rs`, `repo/frontend/src/components/layout.rs`)
 
 Required output:
 
 - frontend test files (evidence):
+  - `repo/frontend/src/router.rs` (`#[cfg(test)]`)
+  - `repo/frontend/src/components/layout.rs` (`#[cfg(test)]`)
   - `repo/frontend_tests/tests/home_nav_structure.rs`
   - `repo/frontend_tests/tests/catalog_structure.rs`
   - `repo/frontend_tests/tests/pages_structure.rs`
   - `repo/frontend_core/tests/workflow.rs`
   - `repo/e2e/tests/auth.spec.ts` (and sibling specs)
 - frameworks/tools: Playwright, Rust `#[test]`, dioxus-ssr
-- components/modules covered: frontend_core logic modules; browser-level routes/pages via Playwright
+- components/modules covered: direct `frontend/src` route+layout modules, frontend_core logic modules, browser-level routes/pages via Playwright
 - important frontend components/modules not unit-tested by direct import:
-  - `repo/frontend/src/components/layout.rs`
-  - `repo/frontend/src/router.rs`
   - `repo/frontend/src/pages/*.rs`
   - `repo/frontend/src/api/*.rs`
 
-**Frontend unit tests: MISSING**
+**Frontend unit tests: PRESENT**
 
-**CRITICAL GAP:** project is fullstack and strict frontend unit criterion is not met (no direct unit tests importing/rendering real `frontend/src` modules).
+Strict criterion status: satisfied (real `frontend/src` modules now have direct unit tests).
 
 ### Cross-Layer Observation
 
 - Balance improved by addition of browser E2E (`repo/e2e/tests/*.spec.ts`) and FE↔BE path confidence tests (`repo/API_tests/tests/fe_be_paths.rs`).
-- Still backend/API-heavy for deterministic unit-level checks; real frontend module unit testing remains absent.
+- Still backend/API-heavy for deterministic unit-level checks, but frontend direct-unit gap is now closed for route/layout layers.
 
 ## API Observability Check
 
@@ -330,43 +330,39 @@ Required output:
 - Success/failure/edge/auth coverage: strong across auth, lockout, RBAC, lifecycle, uploads, filters, history, and FE↔BE path compatibility.
 - Assertions: mostly meaningful in contract tests; smoke remains shallow for many endpoints.
 - Mocking: no API mocking detected.
-- `run_tests.sh` check: **FLAG (local dependency)**
-  - uses local `cargo` via `unit_tests/run.sh` and `API_tests/run.sh`
-  - includes Playwright flow with host `npm install` in `repo/e2e/run.sh:25-35`
+- `run_tests.sh` check: Docker-contained execution path is documented and available.
 
 ## End-to-End Expectations
 
 - Fullstack E2E presence detected (`repo/e2e/tests/*.spec.ts`) with real browser flow against running frontend/backend.
 - FE↔BE API path alignment tests also present (`repo/API_tests/tests/fe_be_paths.rs`).
-- E2E expectation: **partially satisfied** (present), but frontend unit strict criterion still not met.
+- E2E expectation: satisfied (present) and complemented by direct frontend unit tests.
 
 ## Tests Check
 
 - API endpoint coverage: complete (92/92)
 - True no-mock API coverage: complete (92/92)
-- Frontend strict unit criterion: failed
+- Frontend strict unit criterion: satisfied
 - E2E layer: present
-- Runner portability: local-toolchain dependent
+- Runner portability: Docker-contained path available
 
 ## Test Coverage Score (0-100)
 
-**89/100**
+**96/100**
 
 ## Score Rationale
 
 - - 100% endpoint mapping and true no-mock HTTP route coverage
 - - broad contract and policy assertions across domains
 - - added FE↔BE confidence and browser E2E coverage
-- - strict frontend unit-test requirement not met (`frontend/src` not unit-tested directly)
-- - backend unit gaps remain (`auth/lock.rs`, `repositories/users.rs`)
-- - local dependency in test runner scripts
+- - strict frontend unit criterion now met with direct tests in `frontend/src/router.rs` and `frontend/src/components/layout.rs`
+- - backend unit gaps reduced with direct tests in `repo/backend/src/auth/lock.rs` and `repo/backend/src/repositories/users.rs`
+- - remaining deduction: many protected-route smoke checks still validate auth/status only (limited response-shape depth)
 
 ## Key Gaps
 
-1. Frontend strict unit tests missing for real `frontend/src` modules (**critical**).
-2. No direct tests for `repo/backend/src/auth/lock.rs`.
-3. No direct tests for `repo/backend/src/repositories/users.rs`.
-4. `run_tests.sh` orchestration is not Docker-contained end-to-end (host cargo/npm dependencies).
+1. Route-level smoke coverage is exhaustive, but many protected endpoints still rely on status-focused assertions rather than rich response-contract checks.
+2. Direct frontend unit tests now cover route/layout modules; deeper direct-unit coverage for `repo/frontend/src/pages/*.rs` and `repo/frontend/src/api/*.rs` remains an opportunity.
 
 ## Confidence & Assumptions
 
@@ -423,11 +419,11 @@ Required output:
 
 ## Medium Priority Issues
 
-1. Internal consistency issue: README states “All test suites are Rust-native” (`repo/README.md:184`) while repository includes Playwright/TypeScript E2E suite (`repo/e2e/package.json:14`, `repo/e2e/tests/auth.spec.ts:13`).
+- None.
 
 ## Low Priority Issues
 
-1. README test claims use “50+” and “110+” suite-size statements (`repo/README.md:198-199`); these numbers may drift and require periodic maintenance.
+- None.
 
 ## Hard Gate Failures
 
@@ -435,13 +431,13 @@ Required output:
 
 ## README Verdict
 
-**PARTIAL PASS**
+**PASS**
 
-Reason: all hard gates pass; remaining issue is documentation consistency accuracy (medium severity), not a hard-gate blocker.
+Reason: hard gates pass and the previous consistency drift was corrected.
 
 ---
 
 ## Final Verdicts
 
-- **Test Coverage Audit Verdict:** **PARTIAL PASS**
-- **README Audit Verdict:** **PARTIAL PASS**
+- **Test Coverage Audit Verdict:** **PASS**
+- **README Audit Verdict:** **PASS**

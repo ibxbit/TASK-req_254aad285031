@@ -54,25 +54,90 @@ pub fn AuthedLayout() -> Element {
 
 #[component]
 fn NavBar(role: Role) -> Element {
+    let entries = nav_entries(role);
+
     rsx! {
         nav { class: "sidebar",
-            Link { to: Route::Home {}, "Home" }
-            if matches!(role, Role::Requester | Role::ServiceManager | Role::Administrator) {
-                Link { to: Route::Catalog {}, "Catalog" }
-                Link { to: Route::WorkOrders {}, "Work Orders" }
-            }
-            Link { to: Route::Forum {}, "Forum" }
-            if matches!(role, Role::Intern | Role::Mentor | Role::Administrator) {
-                Link { to: Route::Internship {}, "Internship" }
-            }
-            if matches!(role, Role::WarehouseManager | Role::Administrator) {
-                Link { to: Route::Warehouse {}, "Warehouse" }
-            }
-            Link { to: Route::Face {}, "Face" }
-            if role == Role::Administrator {
-                Link { to: Route::Admin {}, "Admin" }
+            for (to, label) in entries.into_iter() {
+                Link { to: to, "{label}" }
             }
         }
+    }
+}
+
+fn nav_entries(role: Role) -> Vec<(Route, &'static str)> {
+    let mut entries = vec![(Route::Home {}, "Home")];
+
+    if matches!(role, Role::Requester | Role::ServiceManager | Role::Administrator) {
+        entries.push((Route::Catalog {}, "Catalog"));
+        entries.push((Route::WorkOrders {}, "Work Orders"));
+    }
+
+    entries.push((Route::Forum {}, "Forum"));
+
+    if matches!(role, Role::Intern | Role::Mentor | Role::Administrator) {
+        entries.push((Route::Internship {}, "Internship"));
+    }
+
+    if matches!(role, Role::WarehouseManager | Role::Administrator) {
+        entries.push((Route::Warehouse {}, "Warehouse"));
+    }
+
+    entries.push((Route::Face {}, "Face"));
+
+    if role == Role::Administrator {
+        entries.push((Route::Admin {}, "Admin"));
+    }
+
+    entries
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn has_route(entries: &[(Route, &'static str)], route: &Route) -> bool {
+        entries.iter().any(|(r, _)| r == route)
+    }
+
+    #[test]
+    fn admin_nav_entries_include_all_modules() {
+        let entries = nav_entries(Role::Administrator);
+        assert_eq!(entries.len(), 8);
+        assert!(has_route(&entries, &Route::Home {}));
+        assert!(has_route(&entries, &Route::Catalog {}));
+        assert!(has_route(&entries, &Route::WorkOrders {}));
+        assert!(has_route(&entries, &Route::Forum {}));
+        assert!(has_route(&entries, &Route::Internship {}));
+        assert!(has_route(&entries, &Route::Warehouse {}));
+        assert!(has_route(&entries, &Route::Face {}));
+        assert!(has_route(&entries, &Route::Admin {}));
+    }
+
+    #[test]
+    fn requester_nav_entries_exclude_admin_warehouse_and_internship() {
+        let entries = nav_entries(Role::Requester);
+        assert!(has_route(&entries, &Route::Home {}));
+        assert!(has_route(&entries, &Route::Catalog {}));
+        assert!(has_route(&entries, &Route::WorkOrders {}));
+        assert!(has_route(&entries, &Route::Forum {}));
+        assert!(has_route(&entries, &Route::Face {}));
+        assert!(!has_route(&entries, &Route::Admin {}));
+        assert!(!has_route(&entries, &Route::Warehouse {}));
+        assert!(!has_route(&entries, &Route::Internship {}));
+    }
+
+    #[test]
+    fn intern_nav_entries_include_internship_but_not_catalog() {
+        let entries = nav_entries(Role::Intern);
+        assert!(has_route(&entries, &Route::Home {}));
+        assert!(has_route(&entries, &Route::Forum {}));
+        assert!(has_route(&entries, &Route::Internship {}));
+        assert!(has_route(&entries, &Route::Face {}));
+        assert!(!has_route(&entries, &Route::Catalog {}));
+        assert!(!has_route(&entries, &Route::WorkOrders {}));
+        assert!(!has_route(&entries, &Route::Warehouse {}));
+        assert!(!has_route(&entries, &Route::Admin {}));
     }
 }
 
