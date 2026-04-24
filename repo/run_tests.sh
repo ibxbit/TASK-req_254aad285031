@@ -62,14 +62,19 @@ run_e2e() {
     echo "============================================================"
     echo " E2E tests  — Playwright (requires docker compose up)"
     echo "============================================================"
+    # Build the prebuilt image. npm deps and test sources are baked in so
+    # the run step needs no network access and no runtime `npm install`.
+    # Layers are cached, so repeat builds are fast when package-lock and
+    # specs are unchanged.
+    if ! docker build -t field-service-hub-e2e:local "$REPO/e2e"; then
+        RC=1
+        return
+    fi
     if ! docker run --rm \
-        -v "$REPO/e2e:/e2e" \
-        -w //e2e \
         --network host \
         -e FRONTEND_URL="${FRONTEND_URL:-http://127.0.0.1:3000}" \
         -e API_BASE="${API_BASE:-http://127.0.0.1:8000}" \
-        mcr.microsoft.com/playwright:v1.44.0-jammy \
-        bash -c "npm install && npx playwright test"; then
+        field-service-hub-e2e:local; then
         RC=1
     fi
 }
